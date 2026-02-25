@@ -4,27 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CHIP.STREAM</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="CHIP.STREAM">
+<meta name="theme-color" content="#000000">
 <style>
 /* ── Google Fonts ────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&display=swap');
 
 /* ── CSS Variables ───────────────────────────────────────── */
 :root {
-  --bg:       #0a0a1a;
-  --panel:    #0f0f2e;
-  --border:   #2a2a6a;
-  --accent:   #00ffcc;
-  --accent2:  #ff00aa;
-  --accent3:  #ffcc00;
-  --text:     #c8c8ff;
-  --dim:      #5555aa;
-  --red:      #ff4466;
+  --bg:       #000000;
+  --panel:    #000000;
+  --panel2:   #000000;
+  --border:   #2b2b2b;
+  --text:     #ffffff;
+  --dim:      #888888;
+  --red:      #ff4455;
   --green:    #44ff88;
-  --scan:     rgba(0,255,200,0.03);
-  --glow:     0 0 8px #00ffcc88, 0 0 24px #00ffcc33;
-  --glow2:    0 0 8px #ff00aa88, 0 0 24px #ff00aa33;
-  --font-px:  'Press Start 2P', monospace;
-  --font-vt:  'VT323', monospace;
+  --rainbow:  linear-gradient(90deg, #ff0055, #ff9900, #ffee00, #00dd66, #00aaff, #aa55ff);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,146 +33,103 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-vt);
-  font-size: 20px;
+  font-family: "Noto Sans JP", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
   overflow-x: hidden;
-}
-
-/* CRT scanlines overlay */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    var(--scan) 2px,
-    var(--scan) 4px
-  );
-  pointer-events: none;
-  z-index: 9999;
-}
-
-/* CRT vignette */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
-  pointer-events: none;
-  z-index: 9998;
-}
-
-/* ── Pixel border utility ────────────────────────────────── */
-.px-box {
-  border: 2px solid var(--border);
-  box-shadow: inset 0 0 0 1px #000,
-              0 0 0 1px #000;
-  image-rendering: pixelated;
 }
 
 /* ── Layout ──────────────────────────────────────────────── */
 #app {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 24px;
   display: grid;
-  gap: 16px;
+  gap: 20px;
 }
 
 /* ── Header ──────────────────────────────────────────────── */
 header {
-  text-align: center;
-  padding: 20px 0 12px;
+  font-size: 22px;
+  font-weight: 400;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
 }
 
 .logo {
-  font-family: var(--font-px);
-  font-size: clamp(14px, 4vw, 24px);
-  color: var(--accent);
-  text-shadow: var(--glow);
-  letter-spacing: 4px;
-  animation: blink-glow 3s ease-in-out infinite;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 1px;
 }
 
-.logo span { color: var(--accent2); text-shadow: var(--glow2); }
+.logo span { color: var(--text); }
 
 .tagline {
-  font-family: var(--font-vt);
-  font-size: 18px;
+  font-size: 12px;
   color: var(--dim);
-  margin-top: 6px;
-  letter-spacing: 2px;
-}
-
-@keyframes blink-glow {
-  0%,100% { text-shadow: var(--glow); }
-  50%      { text-shadow: 0 0 20px #00ffcccc, 0 0 60px #00ffcc66; }
+  margin-top: 4px;
+  letter-spacing: 1px;
 }
 
 /* ── Now Playing ─────────────────────────────────────────── */
 #now-playing {
   background: var(--panel);
-  border: 2px solid var(--accent);
-  box-shadow: var(--glow), inset 0 0 40px rgba(0,255,200,0.04);
-  padding: 16px;
+  border: 1px solid var(--border);
+  padding: 18px;
   position: relative;
   overflow: hidden;
 }
 
 #now-playing::before {
-  content: '▶ NOW PLAYING';
-  font-family: var(--font-px);
-  font-size: 8px;
-  color: var(--accent);
-  letter-spacing: 2px;
-  display: block;
-  margin-bottom: 12px;
-  opacity: 0.7;
+  content: "";
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, #ff0055, #ff9900, #ffee00, #00dd66, #00aaff, #aa55ff);
 }
 
 .np-inner {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: 16px;
+  display: flex;
+  gap: 20px;
   align-items: center;
 }
 
 /* Pixel art album art placeholder */
 .art-pixel {
   width: 80px; height: 80px;
-  image-rendering: pixelated;
-  position: relative;
   flex-shrink: 0;
 }
 
 #pixel-canvas {
   width: 80px; height: 80px;
+  background: #000;
+  border: 1px solid var(--border);
   image-rendering: pixelated;
 }
 
-.np-info { min-width: 0; }
+.np-info { min-width: 0; flex: 1; }
 
 .np-title {
-  font-family: var(--font-px);
-  font-size: clamp(9px, 2vw, 12px);
-  color: #fff;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .np-artist {
-  font-size: 22px;
-  color: var(--accent);
-  margin-bottom: 10px;
+  font-size: 14px;
+  color: var(--dim);
+  margin-bottom: 12px;
 }
 
 /* Progress bar */
 .prog-wrap {
   background: #000;
-  border: 1px solid var(--border);
-  height: 10px;
+  height: 1px;
   position: relative;
   cursor: pointer;
   margin-bottom: 6px;
@@ -181,66 +137,56 @@ header {
 
 .prog-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  background: linear-gradient(90deg, #ff0055, #ff9900, #ffee00, #00dd66, #00aaff, #aa55ff);
   width: 0%;
   transition: width 0.5s linear;
   position: relative;
 }
 
 .prog-fill::after {
-  content: '';
-  position: absolute;
-  right: -3px; top: -3px;
-  width: 8px; height: 16px;
-  background: #fff;
-  image-rendering: pixelated;
+  display: none;
 }
 
 .time-row {
   display: flex;
   justify-content: space-between;
-  font-size: 18px;
+  font-size: 12px;
   color: var(--dim);
+  margin-bottom: 12px;
 }
 
 /* ── Controls ────────────────────────────────────────────── */
 .controls {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
   align-items: center;
 }
 
 .btn-px {
-  font-family: var(--font-px);
-  font-size: 9px;
-  padding: 8px 14px;
-  background: #000;
-  border: 2px solid var(--border);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 16px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
   color: var(--text);
   cursor: pointer;
-  position: relative;
-  transition: all 0.05s;
-  letter-spacing: 1px;
-  image-rendering: pixelated;
+  transition: 0.15s;
+  letter-spacing: 0;
 }
 
 .btn-px:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: var(--glow);
-  background: rgba(0,255,200,0.05);
+  border-image: linear-gradient(#ff0055, #ff9900, #ffee00, #00dd66, #00aaff, #aa55ff) 1;
+  border-width: 1px;
+  border-style: solid;
 }
 
 .btn-px:active {
-  transform: translate(2px,2px);
-  box-shadow: none;
+  opacity: 0.7;
 }
 
 .btn-px.primary {
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: var(--glow);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .btn-px.danger {
@@ -252,7 +198,7 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 12px;
   color: var(--dim);
   flex: 1;
   justify-content: flex-end;
@@ -261,7 +207,7 @@ header {
 input[type=range] {
   -webkit-appearance: none;
   width: 80px;
-  height: 6px;
+  height: 1px;
   background: var(--border);
   outline: none;
   cursor: pointer;
@@ -269,34 +215,31 @@ input[type=range] {
 
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 10px; height: 16px;
-  background: var(--accent);
-  image-rendering: pixelated;
+  width: 8px; height: 14px;
+  background: #fff;
 }
 
 /* ── Waveform visualizer ─────────────────────────────────── */
 #visualizer {
   width: 100%;
-  height: 48px;
+  height: 36px;
   background: #000;
   border: 1px solid var(--border);
   display: block;
-  margin-top: 12px;
-  image-rendering: pixelated;
+  margin-top: 16px;
 }
 
 /* ── Song List ───────────────────────────────────────────── */
 #song-list-section {
   background: var(--panel);
-  border: 2px solid var(--border);
-  padding: 14px;
+  border: 1px solid var(--border);
+  padding: 18px;
 }
 
 .section-title {
-  font-family: var(--font-px);
-  font-size: 9px;
-  color: var(--accent3);
-  letter-spacing: 2px;
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 1px;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
@@ -305,25 +248,24 @@ input[type=range]::-webkit-slider-thumb {
 /* search */
 .search-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
 .px-input {
   background: #000;
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   color: var(--text);
-  font-family: var(--font-vt);
-  font-size: 20px;
-  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px;
   outline: none;
   flex: 1;
   min-width: 0;
 }
 
 .px-input:focus {
-  border-color: var(--accent);
-  box-shadow: var(--glow);
+  border-color: #555;
 }
 
 /* song table */
@@ -333,60 +275,59 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 #song-table th {
-  font-family: var(--font-px);
-  font-size: 7px;
+  font-size: 12px;
   color: var(--dim);
   text-align: left;
   padding: 4px 8px;
   border-bottom: 1px solid var(--border);
-  letter-spacing: 1px;
 }
 
 #song-table td {
-  padding: 7px 8px;
-  border-bottom: 1px solid rgba(42,42,106,0.4);
-  font-size: 19px;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
   vertical-align: middle;
 }
 
-.song-row:hover td { background: rgba(0,255,200,0.04); cursor: pointer; }
-.song-row.active td { background: rgba(0,255,200,0.08); color: var(--accent); }
+.song-row:hover td { background: #0a0a0a; cursor: pointer; }
+.song-row.active {
+  border-left: 4px solid;
+  border-image: linear-gradient(#ff0055, #ff9900, #ffee00, #00dd66, #00aaff, #aa55ff) 1;
+}
 
-.song-row .play-icon { color: var(--accent); font-size: 14px; }
-.song-row td.t-num  { color: var(--dim); font-size: 16px; width: 32px; }
+.song-row .play-icon { color: var(--dim); font-size: 12px; }
+.song-row td.t-num  { color: var(--dim); font-size: 12px; width: 32px; }
 .song-row td.t-title { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.song-row td.t-artist { color: var(--accent); }
-.song-row td.t-ext  { color: var(--dim); font-size: 14px; }
-.song-row td.t-date { color: var(--dim); font-size: 14px; }
+.song-row td.t-artist { color: var(--dim); }
+.song-row td.t-ext  { color: var(--dim); font-size: 12px; }
+.song-row td.t-date { color: var(--dim); font-size: 12px; }
 .song-row td.t-del  { width: 36px; }
 
 .del-btn {
   background: none;
-  border: 1px solid var(--red);
-  color: var(--red);
+  border: 1px solid var(--border);
+  color: var(--dim);
   cursor: pointer;
-  font-size: 13px;
-  padding: 2px 6px;
-  font-family: var(--font-px);
+  font-size: 12px;
+  padding: 4px 8px;
+  font-family: inherit;
 }
-.del-btn:hover { background: var(--red); color: #000; }
+.del-btn:hover { border-color: var(--red); color: var(--red); }
 
 /* empty state */
 .empty {
   text-align: center;
   color: var(--dim);
   padding: 40px;
-  font-size: 18px;
-  font-family: var(--font-px);
-  font-size: 9px;
+  font-size: 14px;
   line-height: 2;
 }
 
 /* ── Upload ──────────────────────────────────────────────── */
 #upload-section {
   background: var(--panel);
-  border: 2px solid var(--border);
-  padding: 14px;
+  border: 1px solid var(--border);
+  padding: 18px;
 }
 
 .upload-grid {
@@ -397,16 +338,15 @@ input[type=range]::-webkit-slider-thumb {
 
 @media (max-width: 560px) {
   .upload-grid { grid-template-columns: 1fr; }
-  .np-inner    { grid-template-columns: 1fr; }
+  .np-inner    { flex-direction: column; align-items: flex-start; }
   .art-pixel   { display: none; }
 }
 
 .field-label {
-  font-family: var(--font-px);
-  font-size: 7px;
+  font-size: 11px;
   color: var(--dim);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   letter-spacing: 1px;
 }
 
@@ -418,14 +358,13 @@ input[type=range]::-webkit-slider-thumb {
   cursor: pointer;
   transition: border-color 0.2s;
   position: relative;
-  font-size: 18px;
+  font-size: 14px;
   color: var(--dim);
 }
 
 .file-drop:hover, .file-drop.drag-over {
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: var(--glow);
+  border-color: #00aaff;
+  color: #00aaff;
 }
 
 .file-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -439,8 +378,7 @@ input[type=range]::-webkit-slider-thumb {
 
 /* ── Status bar ──────────────────────────────────────────── */
 #status-bar {
-  font-family: var(--font-px);
-  font-size: 7px;
+  font-size: 11px;
   color: var(--dim);
   display: flex;
   justify-content: space-between;
@@ -454,21 +392,19 @@ input[type=range]::-webkit-slider-thumb {
   position: fixed;
   bottom: 24px; right: 24px;
   background: var(--panel);
-  border: 2px solid var(--accent);
-  color: var(--accent);
-  font-family: var(--font-px);
-  font-size: 8px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
   padding: 12px 18px;
-  box-shadow: var(--glow);
   display: none;
   z-index: 10000;
   max-width: 280px;
-  line-height: 1.8;
-  letter-spacing: 1px;
+  line-height: 1.6;
 }
 
-#toast.error   { border-color: var(--red); color: var(--red); box-shadow: 0 0 12px #ff446688; }
-#toast.success { border-color: var(--green); color: var(--green); }
+#toast.error   { border-color: var(--red); color: var(--red); }
+#toast.success { border-color: #00dd66; color: #00dd66; }
 
 /* ── Marquee ─────────────────────────────────────────────── */
 .marquee-wrap {
@@ -482,8 +418,8 @@ input[type=range]::-webkit-slider-thumb {
   display: inline-block;
   white-space: nowrap;
   animation: marquee 18s linear infinite;
-  font-size: 16px;
-  color: var(--accent3);
+  font-size: 12px;
+  color: var(--dim);
   letter-spacing: 2px;
 }
 
@@ -492,32 +428,32 @@ input[type=range]::-webkit-slider-thumb {
   to   { transform: translateX(-100%); }
 }
 
-/* ── Pixel "bars" animation ──────────────────────────────── */
+/* ── EQ bars animation ───────────────────────────────────── */
 .eq-bars {
   display: flex;
   gap: 3px;
   align-items: flex-end;
-  height: 24px;
+  height: 20px;
 }
 
 .eq-bar {
-  width: 4px;
-  background: var(--accent);
+  width: 3px;
+  background: #fff;
   animation: eq-bounce 0.5s ease-in-out infinite alternate;
 }
 
-.eq-bar:nth-child(2) { animation-delay: 0.1s; background: var(--accent2); }
+.eq-bar:nth-child(2) { animation-delay: 0.1s; }
 .eq-bar:nth-child(3) { animation-delay: 0.2s; }
-.eq-bar:nth-child(4) { animation-delay: 0.15s; background: var(--accent3); }
-.eq-bar:nth-child(5) { animation-delay: 0.05s; background: var(--accent2); }
+.eq-bar:nth-child(4) { animation-delay: 0.15s; }
+.eq-bar:nth-child(5) { animation-delay: 0.05s; }
 .eq-bar:nth-child(6) { animation-delay: 0.25s; }
 
 @keyframes eq-bounce {
-  from { height: 4px; }
-  to   { height: 24px; }
+  from { height: 3px; }
+  to   { height: 20px; }
 }
 
-.eq-bars.paused .eq-bar { animation-play-state: paused; height: 4px; }
+.eq-bars.paused .eq-bar { animation-play-state: paused; height: 3px; }
 
 </style>
 </head>
@@ -526,14 +462,14 @@ input[type=range]::-webkit-slider-thumb {
 
   <!-- Header -->
   <header>
-    <div class="logo">CHIP<span>.</span>STREAM</div>
-    <div class="tagline">&gt;&gt; 8-BIT MUSIC STREAMING NETWORK &lt;&lt;</div>
+    <div class="logo">CHIP.STREAM</div>
+    <div class="tagline">music streaming</div>
   </header>
 
   <!-- Marquee -->
   <div class="marquee-wrap">
     <span class="marquee-inner" id="marquee-text">
-      ★ WELCOME TO CHIP.STREAM ★ UPLOAD YOUR CHIPTUNE ★ ENDLESS MUSIC ★ NO LOGIN REQUIRED ★
+      ★ CHIP.STREAM へようこそ ★ 音楽をアップロード ★ ログイン不要 ★
     </span>
   </div>
 
@@ -544,8 +480,8 @@ input[type=range]::-webkit-slider-thumb {
         <canvas id="pixel-canvas" width="16" height="16"></canvas>
       </div>
       <div class="np-info">
-        <div class="np-title" id="np-title">── NO SONG LOADED ──</div>
-        <div class="np-artist" id="np-artist">SELECT A TRACK BELOW</div>
+        <div class="np-title" id="np-title">曲が選択されていません</div>
+        <div class="np-artist" id="np-artist">下のリストから選択</div>
 
         <div class="prog-wrap" id="prog-wrap">
           <div class="prog-fill" id="prog-fill"></div>
@@ -556,9 +492,9 @@ input[type=range]::-webkit-slider-thumb {
         </div>
 
         <div class="controls">
-          <button class="btn-px" id="btn-prev" title="Prev">◄◄</button>
-          <button class="btn-px primary" id="btn-play" title="Play/Pause">► PLAY</button>
-          <button class="btn-px" id="btn-next" title="Next Random">NEXT ►</button>
+          <button class="btn-px" id="btn-prev" title="Prev">前へ</button>
+          <button class="btn-px primary" id="btn-play" title="Play/Pause">再生</button>
+          <button class="btn-px" id="btn-next" title="Next Random">次へ</button>
           <div class="eq-bars paused" id="eq-bars">
             <div class="eq-bar" style="height:8px"></div>
             <div class="eq-bar" style="height:16px"></div>
@@ -579,19 +515,19 @@ input[type=range]::-webkit-slider-thumb {
 
   <!-- Song List -->
   <section id="song-list-section">
-    <div class="section-title">[ SONG DATABASE ]</div>
+    <div class="section-title">曲一覧</div>
     <div class="search-row">
-      <input type="text" class="px-input" id="search" placeholder="SEARCH SONGS...">
-      <button class="btn-px" id="btn-refresh">⟳ REFRESH</button>
+      <input type="text" class="px-input" id="search" placeholder="検索">
+      <button class="btn-px" id="btn-refresh">更新</button>
     </div>
     <table id="song-table">
       <thead>
         <tr>
           <th>#</th>
-          <th>TITLE</th>
-          <th>ARTIST</th>
-          <th>FORMAT</th>
-          <th>DATE</th>
+          <th>タイトル</th>
+          <th>アーティスト</th>
+          <th>形式</th>
+          <th>日付</th>
           <th></th>
         </tr>
       </thead>
@@ -603,27 +539,27 @@ input[type=range]::-webkit-slider-thumb {
 
   <!-- Upload -->
   <section id="upload-section">
-    <div class="section-title">[ UPLOAD YOUR CHIPTUNE ]</div>
+    <div class="section-title">アップロード</div>
     <div class="upload-grid">
       <div>
-        <label class="field-label" for="u-title">SONG TITLE</label>
-        <input type="text" class="px-input" id="u-title" placeholder="My Awesome Tune" style="width:100%">
+        <label class="field-label" for="u-title">曲タイトル</label>
+        <input type="text" class="px-input" id="u-title" placeholder="曲名" style="width:100%">
       </div>
       <div>
-        <label class="field-label" for="u-artist">ARTIST NAME</label>
-        <input type="text" class="px-input" id="u-artist" placeholder="8-Bit Hero" style="width:100%">
+        <label class="field-label" for="u-artist">アーティスト名</label>
+        <input type="text" class="px-input" id="u-artist" placeholder="アーティスト" style="width:100%">
       </div>
       <div class="file-drop" id="file-drop">
         <input type="file" id="u-file" accept=".mp3,.ogg,.wav,.flac,.mod,.xm,.s3m,.it,.nsf,.spc,.gbs,.vgm,.vgz">
-        <div id="file-label">▲ DROP AUDIO FILE HERE ▲<br><small style="font-size:14px;color:var(--dim)">MP3 / OGG / WAV / MOD / XM / NSF / SPC…</small></div>
+        <div id="file-label">音声ファイルをここにドラッグ<br><small style="font-size:12px;color:var(--dim)">MP3 / OGG / WAV / MOD / XM / NSF / SPC…</small></div>
       </div>
       <div>
-        <label class="field-label" for="u-comment">COMMENT (OPTIONAL)</label>
-        <input type="text" class="px-input" id="u-comment" placeholder="My first NES track!" style="width:100%">
+        <label class="field-label" for="u-comment">コメント（任意）</label>
+        <input type="text" class="px-input" id="u-comment" placeholder="コメント" style="width:100%">
       </div>
       <div class="upload-actions">
-        <button class="btn-px primary" id="btn-upload">▲ UPLOAD</button>
-        <span id="upload-status" style="font-size:16px;color:var(--dim)"></span>
+        <button class="btn-px primary" id="btn-upload">アップロード</button>
+        <span id="upload-status" style="font-size:13px;color:var(--dim)"></span>
       </div>
     </div>
   </section>
@@ -631,7 +567,7 @@ input[type=range]::-webkit-slider-thumb {
   <!-- Status bar -->
   <div id="status-bar">
     <span id="sb-count">SONGS: 0</span>
-    <span>CHIP.STREAM v1.0</span>
+    <span>CHIP.STREAM</span>
     <span id="sb-time"></span>
   </div>
 
@@ -641,7 +577,7 @@ input[type=range]::-webkit-slider-thumb {
 <div id="toast"></div>
 
 <!-- Hidden audio element -->
-<audio id="player" preload="none"></audio>
+<audio id="player" preload="none" playsinline></audio>
 
 <script>
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -784,6 +720,75 @@ function setupAudio() {
   analyser.connect(audioCtx.destination);
 }
 
+// ── Media Session API ─────────────────────────────────────────────────────────
+function setupMediaSession() {
+  if (!('mediaSession' in navigator)) return;
+
+  navigator.mediaSession.setActionHandler('play', async () => {
+    setupAudio();
+    if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+    player.play().then(() => setPlaying(true)).catch(console.warn);
+  });
+
+  navigator.mediaSession.setActionHandler('pause', () => {
+    player.pause();
+    setPlaying(false);
+  });
+
+  navigator.mediaSession.setActionHandler('nexttrack', () => nextRandom());
+  navigator.mediaSession.setActionHandler('previoustrack', () => prevSong());
+
+  navigator.mediaSession.setActionHandler('seekto', e => {
+    if (e.seekTime !== undefined && player.duration) {
+      player.currentTime = e.seekTime;
+    }
+  });
+
+  navigator.mediaSession.setActionHandler('seekforward', e => {
+    player.currentTime = Math.min(player.duration, player.currentTime + (e.seekOffset || 10));
+  });
+
+  navigator.mediaSession.setActionHandler('seekbackward', e => {
+    player.currentTime = Math.max(0, player.currentTime - (e.seekOffset || 10));
+  });
+}
+
+function updateMediaSessionMetadata(song) {
+  if (!('mediaSession' in navigator)) return;
+
+  // ピクセルアートをDataURLに変換してアートワークに使う
+  const artUrl = pxCanvas.toDataURL('image/png');
+
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title:  song.title,
+    artist: song.artist,
+    album:  'CHIP.STREAM',
+    artwork: [
+      { src: artUrl, sizes: '96x96',   type: 'image/png' },
+      { src: artUrl, sizes: '128x128', type: 'image/png' },
+    ]
+  });
+}
+
+function updateMediaSessionPlaybackState(playing) {
+  if (!('mediaSession' in navigator)) return;
+  navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+}
+
+// PositionState（シークバー）の更新
+player.addEventListener('timeupdate', () => {
+  if (!player.duration || !('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.setPositionState({
+      duration:     player.duration,
+      playbackRate: player.playbackRate,
+      position:     player.currentTime,
+    });
+  } catch(e) { /* ignore */ }
+});
+
+setupMediaSession();
+
 // ── Load & play a song ────────────────────────────────────────────────────────
 async function playSong(song) {
   if (!song) return;
@@ -816,12 +821,16 @@ async function playSong(song) {
   }
 
   highlightActive();
+
+  // Media Session メタデータ更新（pixel artが描かれた後）
+  updateMediaSessionMetadata(song);
 }
 
 function setPlaying(v) {
   isPlaying = v;
-  btnPlay.textContent = v ? '⏸ PAUSE' : '► PLAY';
+  btnPlay.textContent = v ? '⏸ 一時停止' : '再生';
   eqBars.classList.toggle('paused', !v);
+  updateMediaSessionPlaybackState(v);
 }
 
 // ── Auto-next ─────────────────────────────────────────────────────────────────
@@ -992,7 +1001,7 @@ document.getElementById('btn-upload').addEventListener('click', async () => {
       document.getElementById('u-artist').value  = '';
       document.getElementById('u-comment').value = '';
       fileInput.value = '';
-      fileLabel.textContent = '▲ DROP AUDIO FILE HERE ▲';
+      fileLabel.textContent = '音声ファイルをここにドラッグ';
       loadSongs();
     } else {
       showToast('ERROR: ' + (data.error || 'UNKNOWN'), 'error');
@@ -1003,6 +1012,29 @@ document.getElementById('btn-upload').addEventListener('click', async () => {
     uploadStat.textContent = 'ERROR';
   }
   document.getElementById('btn-upload').disabled = false;
+});
+
+// ── Service Worker 登録（バックグラウンド再生維持）────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+    self.addEventListener('fetch', e => {
+      // audio streamのリクエストはネットワーク優先でそのまま通す
+      e.respondWith(fetch(e.request).catch(() => new Response('', {status: 503})));
+    });
+  `;
+  const swBlob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl  = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl, { scope: '/' }).catch(console.warn);
+}
+
+// ── iOS バックグラウンド復帰対策 ─────────────────────────────────────────────
+// スクリーンがロック解除されたり、タブが前面に戻ったときにAudioContextを再開
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && audioCtx && audioCtx.state === 'suspended') {
+    try { await audioCtx.resume(); } catch(e) { console.warn(e); }
+  }
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
