@@ -110,22 +110,6 @@ header {
 
 .np-info { min-width: 0; flex: 1; }
 
-.np-title {
-  font-size: 20px;
-  font-weight: 400;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4px;
-}
-
-.np-artist {
-  font-size: 14px;
-  color: var(--dim);
-  margin-bottom: 12px;
-}
-
 /* Progress bar */
 .prog-wrap {
   background: #000;
@@ -297,8 +281,6 @@ input[type=range]::-webkit-slider-thumb {
 
 .song-row .play-icon { color: var(--dim); font-size: 12px; }
 .song-row td.t-num  { color: var(--dim); font-size: 12px; width: 32px; }
-.song-row td.t-title { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.song-row td.t-artist { color: var(--dim); }
 .song-row td.t-ext  { color: var(--dim); font-size: 12px; }
 .song-row td.t-date { color: var(--dim); font-size: 12px; }
 .song-row td.t-del  { width: 36px; }
@@ -480,9 +462,6 @@ input[type=range]::-webkit-slider-thumb {
         <canvas id="pixel-canvas" width="16" height="16"></canvas>
       </div>
       <div class="np-info">
-        <div class="np-title" id="np-title">曲が選択されていません</div>
-        <div class="np-artist" id="np-artist">下のリストから選択</div>
-
         <div class="prog-wrap" id="prog-wrap">
           <div class="prog-fill" id="prog-fill"></div>
         </div>
@@ -524,8 +503,6 @@ input[type=range]::-webkit-slider-thumb {
       <thead>
         <tr>
           <th>#</th>
-          <th>タイトル</th>
-          <th>アーティスト</th>
           <th>形式</th>
           <th>日付</th>
           <th></th>
@@ -541,21 +518,9 @@ input[type=range]::-webkit-slider-thumb {
   <section id="upload-section">
     <div class="section-title">アップロード</div>
     <div class="upload-grid">
-      <div>
-        <label class="field-label" for="u-title">曲タイトル</label>
-        <input type="text" class="px-input" id="u-title" placeholder="曲名" style="width:100%">
-      </div>
-      <div>
-        <label class="field-label" for="u-artist">アーティスト名</label>
-        <input type="text" class="px-input" id="u-artist" placeholder="アーティスト" style="width:100%">
-      </div>
       <div class="file-drop" id="file-drop">
         <input type="file" id="u-file" accept=".mp3,.ogg,.wav,.flac,.mod,.xm,.s3m,.it,.nsf,.spc,.gbs,.vgm,.vgz">
         <div id="file-label">音声ファイルをここにドラッグ<br><small style="font-size:12px;color:var(--dim)">MP3 / OGG / WAV / MOD / XM / NSF / SPC…</small></div>
-      </div>
-      <div>
-        <label class="field-label" for="u-comment">コメント（任意）</label>
-        <input type="text" class="px-input" id="u-comment" placeholder="コメント" style="width:100%">
       </div>
       <div class="upload-actions">
         <button class="btn-px primary" id="btn-upload">アップロード</button>
@@ -600,8 +565,6 @@ const progFill = document.getElementById('prog-fill');
 const progWrap = document.getElementById('prog-wrap');
 const tCur     = document.getElementById('t-cur');
 const tDur     = document.getElementById('t-dur');
-const npTitle  = document.getElementById('np-title');
-const npArtist = document.getElementById('np-artist');
 const eqBars   = document.getElementById('eq-bars');
 const volSlider= document.getElementById('volume');
 const visCanvas= document.getElementById('visualizer');
@@ -756,13 +719,12 @@ function setupMediaSession() {
 function updateMediaSessionMetadata(song) {
   if (!('mediaSession' in navigator)) return;
 
-  // ピクセルアートをDataURLに変換してアートワークに使う
   const artUrl = pxCanvas.toDataURL('image/png');
 
   navigator.mediaSession.metadata = new MediaMetadata({
-    title:  song.title,
-    artist: song.artist,
-    album:  'CHIP.STREAM',
+    title:  'CHIP.STREAM',
+    artist: '',
+    album:  '',
     artwork: [
       { src: artUrl, sizes: '96x96',   type: 'image/png' },
       { src: artUrl, sizes: '128x128', type: 'image/png' },
@@ -795,17 +757,10 @@ async function playSong(song) {
   if (current) history.push(current.id);
   current  = song;
 
-  npTitle.textContent  = song.title;
-  npArtist.textContent = song.artist;
-
   // Procedural pixel art from song id hash
   let seed = 0;
   for (const c of song.id) seed = (seed * 31 + c.charCodeAt(0)) | 0;
   drawPixelArt(seed);
-
-  // Marquee update
-  document.getElementById('marquee-text').textContent =
-    `★ NOW PLAYING: ${song.title} — ${song.artist} ★ `.repeat(5);
 
   player.src = `${API}/stream/${song.id}`;
   player.volume = parseFloat(volSlider.value);
@@ -896,21 +851,19 @@ async function loadSongs(q = '') {
     renderList(songs);
     sbCount.textContent = `SONGS: ${songs.length}`;
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty">ERROR LOADING SONGS</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty">読み込みエラー</div></td></tr>`;
   }
 }
 
 function renderList(list) {
   if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty">NO SONGS FOUND<br>──────────────<br>BE THE FIRST TO UPLOAD!</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty">曲がありません</div></td></tr>`;
     return;
   }
 
   tbody.innerHTML = list.map((s, i) => `
     <tr class="song-row${current && current.id===s.id ? ' active' : ''}" data-id="${s.id}">
       <td class="t-num">${i + 1}</td>
-      <td class="t-title" title="${esc(s.title)}">${esc(s.title)}</td>
-      <td class="t-artist">${esc(s.artist)}</td>
       <td class="t-ext">${s.ext.replace('.','').toUpperCase()}</td>
       <td class="t-date">${s.uploaded.slice(0,10)}</td>
       <td class="t-del"><button class="del-btn" data-id="${s.id}" title="Delete">✕</button></td>
@@ -973,43 +926,32 @@ fileDrop.addEventListener('drop', e => {
 });
 
 document.getElementById('btn-upload').addEventListener('click', async () => {
-  const title  = document.getElementById('u-title').value.trim();
-  const artist = document.getElementById('u-artist').value.trim();
-  const comment= document.getElementById('u-comment').value.trim();
-  const file   = fileInput.files[0];
+  const file = fileInput.files[0];
 
-  if (!file)   { showToast('SELECT A FILE FIRST!', 'error'); return; }
-  if (!title)  { showToast('ENTER A TITLE!', 'error'); return; }
-  if (!artist) { showToast('ENTER AN ARTIST NAME!', 'error'); return; }
+  if (!file) { showToast('ファイルを選択してください', 'error'); return; }
 
   const fd = new FormData();
-  fd.append('title',   title);
-  fd.append('artist',  artist);
-  fd.append('comment', comment);
-  fd.append('file',    file);
+  fd.append('file', file);
 
-  uploadStat.textContent = 'UPLOADING...';
+  uploadStat.textContent = 'アップロード中...';
   document.getElementById('btn-upload').disabled = true;
 
   try {
     const res  = await fetch(`${API}/api/upload`, { method: 'POST', body: fd });
     const data = await res.json();
     if (data.ok) {
-      showToast('UPLOAD COMPLETE! ▲', 'success');
+      showToast('アップロード完了', 'success');
       uploadStat.textContent = '';
-      document.getElementById('u-title').value   = '';
-      document.getElementById('u-artist').value  = '';
-      document.getElementById('u-comment').value = '';
       fileInput.value = '';
       fileLabel.textContent = '音声ファイルをここにドラッグ';
       loadSongs();
     } else {
-      showToast('ERROR: ' + (data.error || 'UNKNOWN'), 'error');
-      uploadStat.textContent = 'FAILED';
+      showToast('エラー: ' + (data.error || '不明'), 'error');
+      uploadStat.textContent = '失敗';
     }
   } catch(e) {
-    showToast('NETWORK ERROR', 'error');
-    uploadStat.textContent = 'ERROR';
+    showToast('ネットワークエラー', 'error');
+    uploadStat.textContent = 'エラー';
   }
   document.getElementById('btn-upload').disabled = false;
 });
