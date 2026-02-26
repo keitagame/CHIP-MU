@@ -24,7 +24,7 @@ CHUNK_SIZE = 65536   # 64 KB streaming chunks
 
 ALLOWED_EXTS = {
     ".mp3", ".ogg", ".wav", ".flac", ".mod", ".xm", ".s3m",
-    ".it", ".nsf", ".spc", ".gbs", ".vgm", ".vgz",
+    ".it", ".nsf", ".spc", ".gbs", ".vgm", ".vgz",".fc",
 }
 
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -231,7 +231,9 @@ class ChipHandler(BaseHTTPRequestHandler):
         if not fpath.exists():
             self.send_error_json("File missing", 404)
             return
-
+        if target["ext"] == ".fc":
+            self._stream_fc_as_wav(fpath)
+            return
         file_size = fpath.stat().st_size
         mime_type = mimetypes.guess_type(str(fpath))[0] or "application/octet-stream"
 
@@ -330,7 +332,49 @@ class ChipHandler(BaseHTTPRequestHandler):
 
         return fields, file_data, filename
 
+def _stream_fc_as_wav(self, fpath):
+    with open(fpath, "rb") as f:
+        header = f.read(6)
 
+        sample_rate = int.from_bytes(header[0:4], "little")
+        channels    = int.from_bytes(header[4:6], "little")
+        bit_depth   = 16
+
+        pcm_size = os.path.getsize(fpath) - 6
+
+        import struct
+
+        byte_rate = sample_rate * channels * bit_depth // 8
+        block_align = channels * bit_depth // 8
+
+        wav_header = struct.pack(
+            "<4sI4s4sIHHIIHH4sI",
+            b"RIFF",
+            36 + pcm_size,
+            b"WAVE",
+            b"fmt ",
+            16,
+            1,
+            channels,
+            sample_rate,
+            byte_rate,
+            block_align,
+            bit_depth,
+            b"data",
+            pcm_size
+        )
+
+        self.send_response(200)
+        self.send_header("Content-Type", "audio/wav")
+        self.end_headers()
+
+        self.wfile.write(wav_header)
+
+        while True:
+            chunk = f.read(CHUNK_SIZE)
+            if not chunk:
+                break
+            self.wfile.write(chunk)
 # ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print(f"""
