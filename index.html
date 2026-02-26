@@ -676,7 +676,7 @@ function setupAudio() {
 
   audioCtx = new (window.AudioContext || window.webkitAudioContext)({
     latencyHint: "playback",
-    sampleRate: 48000 // 高音質
+    sampleRate: 96000 // 高音質
   });
 
   analyser = audioCtx.createAnalyser();
